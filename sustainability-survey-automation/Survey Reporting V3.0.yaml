@@ -1,0 +1,279 @@
+openapi: 3.0.0
+info:
+  title: ESG Survey Reporting
+  description: API for uploading, generation report for based on input documentation and survey questionnire.
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /esgreports/upload:
+    post:
+      summary: Upload the ESG Reports
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                documentName:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                DocumentURL:
+                  type: array
+                  items:
+                    type: string
+                    nullable: false
+                YearOfReport:
+                    type: string
+                    nullable: false
+              required:
+                - YearOfReport
+
+      responses:
+        '200':
+          description: Document Uploaded Successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  trackerId:
+                    type: string
+
+  /esgreports/retrieve:
+    post:
+      summary: Retrieve list all the uploaded ESG reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reportYear:
+                  type: string
+              required:
+                - reportYear
+      responses:
+        '200':
+          description: List all the uploaded ESG Documents for the year
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UploadedDocuments'
+
+  /questionnaire/generatefirstdraft/pdf:
+    post:
+      summary: Upload the Survey Questionnire
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                SurveyQuestionnaireDocumentName:
+                  type: string
+                  format: binary
+                document Type:
+                  type: string
+                  enum: [PDF, XLS]
+                  description: Base64 encoded pdf content or excel
+                metadata:
+                  type: object
+                  properties:
+                    generateReportforYear:
+                      type: string
+                    userId:
+                      type: string
+              required:
+                - documentName
+                - metadata
+                - documentType
+                - generateReportforYear
+                - userId
+      responses:
+        '200':
+          description: Document Generated Successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  taskid:
+                    type: string
+                  status:
+                    type: string
+                  createAt:
+                    type: string
+
+  /questionnaire/generatefirstdraft/pdf/{reportYear}/{TaskId}/status:
+    get:
+      summary: Find status of the Survey Questionnire
+      parameters:
+        - in: path
+          name: reportYear
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: TaskId
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Document Generated Successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  taskid:
+                    type: string
+                  status:
+                    type: string
+                  createAt:
+                    type: string
+                    
+  /firstdraftreport/download/result/{reportYear}:
+    get:
+      summary: Download the First Draft Report
+      parameters:
+        - in: path
+          name: reportYear
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Document Generated Successfully
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UploadedDocuments'
+
+  /questionnaire/generatefirstdraft/generateAnswer:
+    post:
+      summary: Retrieve response for the specific question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reportYear:
+                  type: string
+                inputQuestion:
+                  type: string                  
+              required:
+                - reportYear
+                - inputQuestion
+
+      responses:
+        '200':
+          description: Response for the Specific Question Posted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reportYear:
+                    type: string
+                  questionnireSummary:
+                    type: object
+                    properties:
+                      response:
+                        type: string
+                      status:
+                        type: string
+                      citation:
+                        type: string
+                      documentReference:
+                        type: string
+                        description: provide the list of files url's referred to generate the answer
+                      accuracy:
+                        type: string
+                      confidenceScores:
+                        type: string                    
+
+components:
+  schemas:
+    UploadedDocuments:
+      type: object
+      properties:
+        documentName:
+          type: string
+        metadata:
+          type: object
+          properties:
+            documentType:
+              type: string
+              enum: [URL, PDF]
+            referenceLink:
+              type: string
+              nullable: true
+            generated By:
+              type: string
+            reportYear:
+              type: string
+
+    ResponseAccuracyQ:
+      type: object
+      properties:
+        QuestionNumber:
+          type: string
+        QuestionSubSection:
+          type: string
+        metadata:
+          type: object
+          properties:
+            Response:
+              type: string
+            Status:
+              type: string
+            Citation:
+              type: string
+            Accuracy:
+              type: string
+            ConfidenceScores:
+              type: string
+
+    RequestAccuracyQ:
+      type: object
+      properties:
+        QuestionNumber:
+          type: string
+        QuestionSubSection:
+          type: string
+        metadata:
+          type: object
+          properties:
+            inputQuestion:
+              type: string
+            InputSubSection:
+              type: string
+            QuestionType:
+              type: string
+              enum: [write in, write in table, Radio Button, Radio Button and Write in, Radio Button and write in table, Automatically Calculated]
+            
