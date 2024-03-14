@@ -1,0 +1,19 @@
+{
+  "esgResponse": [
+    {
+      "entityName": "Graco",
+      "benchmarkDetails": {
+        "esgType": "Environment",
+        "esgIndicators": "solarPanelInstallation",
+        "primaryDetails": "Information Not Available",
+        "secondaryDetails": "Information Not Available",
+        "citationDetails": "string",
+        "pageNumber": 0
+      },
+      "Metrics": {
+        "timeTaken": 0,
+        "leveragedModel": "string"
+      }
+    }
+  ]
+}
