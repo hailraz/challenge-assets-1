@@ -217,7 +217,7 @@ paths:
                       confidenceScores:
                         type: string                    
 
-  /esgreports/keepalive:
+  /esgreports/keepalive/ping:
     get:
       summary: Ping service
       responses:
