@@ -217,6 +217,22 @@ paths:
                       confidenceScores:
                         type: string                    
 
+  /esgreports/keepalive:
+    get:
+      summary: Ping service
+      responses:
+        '200':
+          description: Connection Check to API
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+
 components:
   schemas:
     UploadedDocuments:
